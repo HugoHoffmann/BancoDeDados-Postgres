@@ -1,0 +1,101 @@
+Criar tabela venda outra produto e uma associativa, sempre que for feito uma venda vai ter um CLIENTE e TODA venda vai ter um VENDEDOR 
+
+Cliente( 
+codigo
+nome 
+CPF
+validação unique para CPF
+)Por um varchar com tamanho;
+
+A checagem só funciona quando se é informado o campo, caso seja informada como not null ela verifica a checagem
+
+VEndedor só vai ter o código e o nome
+
+constraint check_vendata check(vendata = now())
+checagem da data atual 
+
+
+Inserir a data atual como padrão 
+vendata date not null default now(),
+
+
+venda(
+	codigo
+	data (checagem da data maior que 1/1/1900)
+	codigocliente
+	codigovendedor
+	
+
+);
+
+produto(
+	codigo
+	(unique)NOME DO PRODUTO
+	preco
+	
+)
+vendaproduto(
+chave estrangeira composta de venda
+chave estranhageira de produto
+quantidade(checagem tem que ser maior que 0)
+valor de venda(valor unitário)valorUnit (checagem para o valor unitário maior que 0)
+)
+
+)
+
+
+
+
+tudo como not null
+
+
+create schema vendas;
+
+CREATE TABLE vendas.tbcliente(
+	clicodigo SERIAL,
+	clinome VARCHAR(20) NOT NULL,
+	clicpf VARCHAR (14) NOT NULL,
+	CONSTRAINT pk_tbcliente PRIMARY KEY (clicodigo),
+	CONSTRAINT uk_tbcliente unique(clicpf)
+);
+CREATE TABLE vendas.tbvendedor(
+	vencodigo SERIAL,
+	vennome VARCHAR (20) NOT NULL,
+	CONSTRAINT pk_tbvendedor PRIMARY KEY (vencodigo)
+);
+CREATE TABLE vendas.tbproduto(
+	procodigo SERIAL,
+	pronome VARCHAR(25) NOT NULL,
+	propreco NUMERIC (12,2) NOT NULL,
+	CONSTRAINT pk_tbproduto PRIMARY KEY (procodigo),
+	CONSTRAINT uk_tbproduto unique(pronome)
+
+);
+CREATE TABLE vendas.tbvenda(
+	vendacodigo SERIAL,
+	vendata DATE NOT NULL,
+	clicodigo INTEGER,
+	vencodigo INTEGER,
+	CONSTRAINT pk_tbvenda PRIMARY KEY (vendacodigo),
+	CONSTRAINT "TBVENDA -> TBCLIENTE" FOREIGN KEY (clicodigo)
+	 REFERENCES vendas.tbcliente (clicodigo),
+	CONSTRAINT "TBVENDA -> TBVENDEDOR" FOREIGN KEY (vencodigo)
+	 REFERENCES vendas.tbvendedor (vencodigo),
+	CONSTRAINT check_vendata check (vendata>'01/01/1900')
+);
+CREATE TABLE vendas.tbvendaproduto(
+	vendacodigo INTEGER,
+	procodigo INTEGER,
+	venqtd INTEGER NOT NULL,
+	venvalorunit INTEGER NOT NULL,
+	CONSTRAINT pk_tbvendaproduto PRIMARY KEY (vendacodigo, procodigo),
+	CONSTRAINT "TBVENDAPRODUTO -> TBVENDA" FOREIGN KEY (vendacodigo)
+	 REFERENCES vendas.tbvenda(vendacodigo),
+	CONSTRAINT "TBVENDAPRODUTO -> TBPRODUTO" FOREIGN KEY (procodigo)
+	 REFERENCES vendas.tbproduto (procodigo),
+	CONSTRAINT check_venqtd check(venqtd<0),
+	CONSTRAINT check_venvalorunit check(venvalorunit<0),
+	CONSTRAINT uk_venvalorunit unique(venvalorunit)
+
+);
+

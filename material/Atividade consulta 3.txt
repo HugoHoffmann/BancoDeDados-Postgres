@@ -1,0 +1,125 @@
+Atividade consulta 3
+
+1.a) R:
+SELECT *
+ FROM treina.tbpessoacontato
+ WHERE ctpdescricao='Celular'
+ AND ctpnumero like '47%'
+
+1.b) R:
+SELECT *
+ FROM treina.tbpessoacontato
+ WHERE ctpnumero NOT like '47%'
+
+1.c) R:
+
+SELECT logtipo AS "Tipo de logradouro", logdescricao AS "Descrição do logradouro" 
+ FROM treina.tblogradouro
+ WHERE NOT logtipo='Rua'
+
+1.d) R:
+SELECT logtipo AS "Tipo de logradouro", logdescricao AS "Descrição do logradouro" 
+ FROM treina.tblogradouro
+ WHERE logtipo='Travessa' OR logtipo='Beco'
+
+1.e) R:
+SELECT * 
+ FROM treina.tbimovel
+ WHERE NOT imvdescricao ILIKE '%alvenaria%' AND imvlargura>15
+
+
+
+1.f) R:
+ SELECT *
+ FROM treina.tblogradouro
+ WHERE logtipo='Rua' AND logdescricao='Oscar Barcelos'
+
+2.a) R:
+SELECT *
+ FROM treina.tbpessoacontato
+ WHERE ctpdescricao='Telefone'
+ ORDER BY ctpnumero
+
+2.b) R:
+ SELECT *
+ FROM treina.tbpessoa
+ WHERE pestipo=2
+ ORDER BY pesnome
+2.c) R:
+
+SELECT *
+ FROM treina.tblogradouro
+ ORDER BY logdescricao DESC
+
+2.d) R:
+
+ SELECT *
+ FROM treina.tbimovel
+ WHERE imvdescricao='IMOVEL DE MADEIRA'
+ ORDER BY imvcomprimento DESC
+
+3.a) R:
+SELECT MAX(imvlargura)
+ FROM treina.tbimovel
+
+3.b) R:
+
+  SELECT MIN(imvcomprimento)
+ FROM treina.tbimovel
+
+3.c) R:
+SELECT MAX(imvlargura*imvcomprimento)
+ FROM treina.tbimovel
+
+3.d) R:
+SELECT COUNT(logcodigo)AS CONTAGEM
+ FROM treina.tblogradouro
+
+3.e)R:
+
+SELECT COUNT(logcodigo)
+FROM treina.imovel
+WHERE imvdescricao='Imovel de madeira'
+
+3.f) R:
+SELECT AVG(imvlargura)
+FROM treina.tbimove
+
+3.g) R:
+SELECT SUM(imvlargura)
+FROM treina.tbimove
+
+4.a) R:
+SELECT pescodigo AS CODIGO, imvdescricao AS DESCRICAO, imvlargura AS LARGURA,imvcomprimento AS COMPRIMENTO
+ FROM treina.tbimovel
+ORDER BY pescodigo DESC
+4.b) R:
+
+SELECT logcodigo AS CODIGO, logtipo AS TIPO, logdescricao AS DESCRICAO
+FROM treina.tblogradouro
+WHERE logtipo='Avenida'
+
+4.c) R:
+
+SELECT pescodigo AS "CODIGO DA PESSOA", pesnome AS "NOME COMPLETO"
+FROM treina.tbpessoa
+WHERE pessexo=2
+ORDER BY pesnome
+
+5)R:
+SELECT *
+FROM treina.tbpessoa
+WHERE pescodigo BETWEEN 21 and 30;
+
+6)R:
+
+SELECT pescodigo, COUNT(ctpnumero) AS TELEFONE
+
+7)R:
+SELECT *
+FROM treina.tbpessoa LIMIT 10 OFFSET 20;
+
+
+    FROM treina.tbpessoacontato 
+  GROUP BY pescodigo
+

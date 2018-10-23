@@ -1,0 +1,101 @@
+tbautor -> tbgenero -> tblocalizacao - > tblivro -> tbautorlivro -> tdgenerolivro -> tbexemplar -> tbemprestimo -> tbemprestimoexemplar
+
+
+/*FAzer banco com validações  tbexemplar checar a exesituação só pode aceitar o 0 e 1-
+livnome por uma unique que não deixa ter numeros repetidos-
+uma unique 
+autnome vai ser uma unique -
+gennome também irá possuir uma unique -
+locnome também será unique - 
+validar empdiasemprestimos terá que ser maior que 0 e máximo 7 igual a sete está incluso*/
+
+
+
+
+/*Criação de tabela tbautor*/
+CREATE TABLE exevalidacao.tbautor(
+	autcodigo integer NOT NULL,
+	autnome varchar (20) not null,
+	constraint pk_tbautor primary key (autcodigo),
+	constraint uk_autnome unique(autnome)
+);
+/*Criação de tabela tbgenero*/
+CREATE TABLE exevalidacao.tbgenero(
+	gencodigo integer NOT NULL,
+	gennome varchar (20) not null,
+	constraint pk_tbgenero primary key (gencodigo),
+	constraint uk_gennome unique(gennome)
+);
+/*Criação de tabela tblocalização*/
+CREATE TABLE exevalidacao.tblocalizacao(
+	loccodigo integer NOT NULL,
+	locnome varchar (20) not null,
+	constraint pk_tblocalizacao primary key (loccodigo),
+	constraint uk_locnome unique(locnome)
+);
+/*Criação de tabela tblivro*/
+CREATE TABLE exevalidacao.tblivro(
+	livcodigo integer NOT NULL,
+	livnome varchar (20) not null,
+	loccodigo integer not null,
+	constraint pk_tblivro primary key (livcodigo),
+        constraint "FK TBLIVRO -> TDLOCALIZACAO" foreign key (loccodigo) 
+        references exevalidacao.tblocalizacao(loccodigo),
+	constraint uk_livnome unique(livnome)
+);
+
+
+/*Criação de tabela associativa tbautorlivro*/
+create table exevalidacao.tbautorlivro(
+	livcodigo integer not null,
+	autcodigo integer not null,
+	constraint pk_tbautorlivro primary key (livcodigo, autcodigo),
+	constraint "FK TBAUTORLIVRO -> TDLIVRO" foreign key (livcodigo)
+	references exevalidacao.tblivro(livcodigo),
+	constraint "FK TBAUTORLIVRO -> TDAUTOR" foreign key (autcodigo)
+	references exevalidacao.tbautor(autcodigo)
+);
+
+
+/*Criação de tabela associativa tbgenerolivro*/
+create table exevalidacao.tbgenerolivro(
+	gencodigo integer NOT null,
+	livcodigo integer not null,
+	constraint pk_tbgenerolivro primary key (gencodigo ,livcodigo),
+	constraint "FK TBGENEROLIVRO -> TDGENERO" foreign key (gencodigo)
+	references exevalidacao.tbgenero(gencodigo),
+	constraint "FK TBGENEROLIVRO -> TDLIVRO" foreign key (livcodigo)
+	references exevalidacao.tblivro(livcodigo)
+);
+/*Criação da tabela exemplar, sendo que a coluna exesituação só pode aceitar 0 ou 1*/
+CREATE TABLE exevalidacao.tbexemplar(
+	execodigo integer NOT NULL,
+	exesituacao smallint not null,
+	livcodigo integer not null,
+	constraint pk_tbexemplar primary key (execodigo),
+        constraint "FK TBEXEMPLAR -> TDLIVRO" foreign key (livcodigo)
+        references exevalidacao.tblivro(livcodigo),
+	constraint check_exesituacao 
+	check(exesituacao IN(0,1))
+);
+		  
+/*Criando a tabela tdemprestimo*/
+
+CREATE TABLE exevalidacao.tbemprestimo(
+	empcodigo integer not null,
+	empdata date not null,
+	empdiasemprestimo integer not null,
+	constraint pk_tbemprestimo primary key(empcodigo),
+	constraint check_empdiasemprestimo 
+	check(empdiasemprestimo>0 and empdiasemprestimo<=7)
+);
+		  
+/*Criando tabela associativa emprestimoexemplar*/
+		  
+CREATE TABLE exevalidacao.tdemprestimoexemplar(
+	execodigo integer not null,
+	empcodigo integer not null,
+	constraint pk_emprestimoexemplar primary key (execodigo, empcodigo),
+	constraint "FK TBEMPRESTIMOEXEMPLAR -> TBEXEMPLAR" FOREIGN KEY (execodigo)
+	references exevalidacao.tbexemplar(execodigo)
+);

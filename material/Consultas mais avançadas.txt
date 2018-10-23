@@ -1,0 +1,249 @@
+SELECT pescodigo, imvcodigo, taxvalor
+    FROM treina.tbtaxa
+ WHERE taxvalor = (SELECT MAX(taxvalor) FROM treina.tbtaxa);
+
+
+SELECT pescodigo, imvcodigo, taxvalor
+    FROM treina.tbtaxa
+ WHERE taxvalor = (SELECT MIN(taxvalor) FROM treina.tbtaxa);
+
+/*Realializar a mesma consulta acima sem o uso dos subselects*/
+
+/*Trocando o Subselect com os dados da maior taxa*/
+SELECT pescodigo, imvcodigo, taxvalor 
+    FROM treina.tbtaxa ORDER BY taxvalor DESC LIMIT 1;
+
+/*Trocando o Subselect com os dados da menor taxa*/
+SELECT pescodigo, imvcodigo, taxvalor 
+    FROM treina.tbtaxa ORDER BY taxvalor LIMIT 1;
+
+
+/*Trocando o OR pelo UNION*/
+SELECT * 
+   FROM treina.tbpessoa 
+  WHERE pessexo = 1 OR pesnome LIKE 'Cli%';
+/*Realizando a troca*/
+SELECT * 
+   FROM treina.tbpessoa 
+  WHERE pessexo = 1 
+UNION
+SELECT * 
+   FROM treina.tbpessoa 
+  WHERE pesnome LIKE 'Cli%'; 
+
+
+Esse é um formato comum de JOIN, que retorna dados apenas quando as duas tabelas tem chaves correspondentes na cláusula ON do JOIN.
+SELECT TabelaA.*, TabelaB.* 
+   FROM TabelaA 
+   INNER JOIN TabelaB 
+     ON TabelaA.Chave = TabelaB.Chave
+
+
+/*Junção das tabelas tbvendas e tbcliente mostrando as colunas clinome, vencodigo e vendata*/
+SELECT clinome, vencodigo, vendata 
+FROM vendas.tbvenda 
+INNER JOIN vendas.tbcliente
+ON tbvenda.clicodigo = tbcliente.clicodigo
+
+SELECT clinome, vencodigo, vendata 
+FROM vendas.tbvenda 
+INNER JOIN vendas.tbcliente
+USING(clicodigo)
+
+/*Nome da pessoa, tipo de logradouro e a descricação do logradouro*/
+
+SELECT pesnome, logtipo, logdescricao
+FROM treina.tbpessoa
+INNER JOIN treina.tblogradouro
+ON tbpessoa.pescodigo=tblogradouro.pescodigo
+
+
+
+/**/
+
+SELECT pesnome, 
+logtipo, 
+logdescricao
+  FROM treina.tbpessoa
+  INNER JOIN treina.tblogradouro
+    ON tbpessoa.logcodigo = tblogradouro.logcodigo;
+
+
+/**/
+
+SELECT pesnome, 
+logtipo, 
+logdescricao
+  FROM treina.tbpessoa
+  INNER JOIN treina.tblogradouro
+    ON tbpessoa.logcodigo = tblogradouro.logcodigo;
+    WHERE tblogradouro.logcodigo IS NULL;
+
+
+Segue o mesmo raciocínio do Left Join, mas se aplicando à tabela B em vez da A:
+SELECT pesnome, 
+logtipo, 
+logdescricao 
+    FROM treina.tbpessoa
+    RIGHT JOIN treina.tblogradouro 
+     ON tbpessoa.logcodigo = tblogradouro.logcodigo;
+
+  
+
+SELECT pesnome, logtipo, logdescricao
+FROM treina.tbpessoa
+RIGHT JOIN treina.tblogradouro 
+ON tbpessoa.logcodigo = tblogradouro.logcodigo
+WHERE tbpessoa.logcodigo IS NULL;
+
+
+SELECT pesnome, logtipo, logdescricao
+FROM treina.tblogradouro
+LEFT JOIN treina.tbpessoa
+ON tblogradouro.logcodigo = tbpessoa.logcodigo
+WHERE tbpessoa.logcodigo IS NULL;
+
+
+/*Duas formas de vericar as pessoas que poossuem endereço*/
+
+SELECT tbpessoa.pesnome
+ FROM treina.tbpessoa
+WHERE EXISTS (SELECT logcodigo
+		FROM treina.tblogradouro
+	      WHERE logcodigo=treina.tbpessoa.logcodigo LIMIT 1);
+/*Acima com a utilização de subselect*/
+
+/*Abaixo com a utilização do inner join*/
+SELECT tbpessoa.pesnome
+FROM treina.tbpessoa
+ INNER JOIN treina.tblogradouro
+  ON tbpessoa.logcodigo=tblogradouro.logcodigo
+
+
+
+/*Utilização do case*/
+/*A vantagem de se utilizar esta forma de verificação é que quando é encontrado o número a verificação para*/
+SELECT CASE WHEN EXISTS(
+ SELECT *
+  FROM treina.tbpessoa
+ WHERE pescodigo='1'
+)
+THEN CAST(1 AS BIT)
+ELSE CAST(0 AS BIT)
+END
+
+/*OU*/
+
+SELECT CASE WHEN EXISTS(
+ SELECT *
+  FROM treina.tbpessoa
+ WHERE pescodigo='1'
+)
+THEN CAST (true AS BOOLEAN)
+ELSE CAST (false AS BOOLEAN)
+END
+
+/*Exemplo de select quando um tabela possui duas chaves estrangeiras que tem como referencia a mesma chave primaria*/
+
+SELECT *
+ FROM veicu.tbcor AS corinterna
+  INNER JOIN veicu.tbveiculo
+   ON (corinterna.corcodigo=tbveiculo.corinterna)
+  INNER JOIN veicu.tbcor AS corexterna
+   ON (corexterna.corcodigo=tbveiculo.corexterna)
+
+/*Otimizando*/
+
+
+SELECT veimarca, veimodelo, corinterna.cornome, corexterna.cornome
+ FROM veicu.tbcor AS corinterna
+  INNER JOIN veicu.tbveiculo
+   ON (corinterna.corcodigo=tbveiculo.corinterna)
+  INNER JOIN veicu.tbcor AS corexterna
+   ON (corexterna.corcodigo=tbveiculo.corexterna)
+
+
+
+
+--------------
+CREATE TABLE fun.tbprojeto(
+	procodigo serial,
+	prodescricao VARCHAR(50) NOT NULL,
+	profuncionario integer not null,
+	progerente integer not null,
+	CONSTRAINT pk_tbprojeto PRIMARY KEY (procodigo),
+	CONSTRAINT "FK TBPROJETO -> PROFUNCIONARIO" FOREIGN KEY(profuncionario)
+	 REFERENCES fun.tbfuncionario(funcodigo),
+	CONSTRAINT "FK TBPROJETO -> PROGERENTE" FOREIGN KEY (progerente)
+	 REFERENCES fun.tbfuncionario(funcodigo)
+)
+
+INSERT INTO fun.tbprojeto(
+	prodescricao, profuncionario, progerente
+)VALUES ('Algum projeto louco',2,2)
+
+CREATE TABLE fun.tbfuncionario(
+	funcodigo serial,
+	funnome VARCHAR (20) NOT NULL,
+	funcpf VARCHAR (14) NOT NULL,
+	CONSTRAINT pk_tbfuncionario PRIMARY KEY (funcodigo) 
+);
+
+INSERT INTO fun.tbfuncionario(
+	funnome, funcpf
+)VALUES ('Hugaum','345.454.433-15')
+
+/*Consulta na tabela criada acima*/
+
+SELECT *
+FROM fun.tbfuncionario AS PROFUN
+ INNER JOIN fun.tbprojeto
+  ON (PROFUN.funcodigo=tbprojeto.profuncionario)
+ INNER JOIN fun.tbfuncionario AS PROGE
+  ON (PROGE.funcodigo=tbprojeto.progerente)
+
+
+SELECT tbprojeto.prodescricao, PROFUN.funnome AS Funcionario, PROGE.funnome AS Gerente
+FROM fun.tbfuncionario AS PROFUN
+ INNER JOIN fun.tbprojeto
+  ON (PROFUN.funcodigo=tbprojeto.profuncionario)
+ INNER JOIN fun.tbfuncionario AS PROGE
+  ON (PROGE.funcodigo=tbprojeto.progerente)
+
+/*Exemplo de case*/
+
+SELECT A,
+	CASE WHEN A=1 THEN 'UM'
+	     WHEN A=2 THEN 'DOIS'
+	     ELSE 'OUTRO'
+	END
+  FROM teste;
+
+
+/*Uso de case no schema treina*/
+
+SELECT pessexo,
+	CASE WHEN pessexo=1 THEN 'MASCULINO'
+	     WHEN pessexo=2 THEN 'FEMININO'
+	     ELSE 'OUTRO'
+	END AS SEXO,
+pestipo, 
+	CASE WHEN pestipo=1 THEN 'Fisica'
+	     WHEN pestipo=2 THEN 'Juridica'
+	     ELSE 'Outros'
+	END AS TIPO
+FROM treina.tbpessoa
+
+SELECT pesnome, 
+	CASE WHEN pessexo=1 THEN 'MASCULINO'
+	     WHEN pessexo=2 THEN 'FEMININO'
+	     ELSE 'OUTRO'
+	END AS SEXO,
+ 
+	CASE WHEN pestipo=1 THEN 'Fisica'
+	     WHEN pestipo=2 THEN 'Juridica'
+	     ELSE 'Outros'
+	END AS TIPO
+FROM treina.tbpessoa
+
+

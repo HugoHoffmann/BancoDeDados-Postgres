@@ -1,0 +1,92 @@
+/*Atividade 02*/
+
+/*1.a*/
+SELECT *
+ FROM treina.tbpessoacontato;
+
+ /*1.b*/
+SELECT *
+ FROM treina.tbimoveis;
+
+ /*1.c*/
+SELECT *
+ FROM treina.tbpessoa;
+
+ /*1.d*/
+SELECT *
+ FROM treina.tblogradouro;
+
+
+ /*2.a*/
+SELECT pescodigo, ctpnumero
+ FROM treina.tbpessoacontato
+
+ /*2.b*/
+SELECT imvcodigo, imvlargura, imvcomprimento
+ FROM treina.tbimovel
+
+ /*2.c*/
+ SELECT pescodigo, pesnome, pestipo
+ FROM treina.tbpessoa
+
+
+ /*3*/
+
+ SELECT DISTINCT imvdescricao
+  FROM treina.tbimovel
+
+  /*4*/
+
+  SELECT DISTINCT logtipo
+   FROM treina.tblogradouro
+
+   /*5.a*/
+SELECT *
+ FROM treina.tbpessoacontato
+WHERE ctpdescricao='Celular'
+
+   /*5.b*/
+SELECT pescodigo, ctpnumero
+ FROM treina.tbpessoacontato
+WHERE pescodigo=100001
+
+
+
+   /*5.c*/
+SELECT pescodigo, ctpnumero
+ FROM treina.tbpessoacontato
+WHERE ctpramal=357
+
+   /*5.d*/
+SELECT imvcodigo, imvlargura, imvcomprimento
+ FROM treina.tbimovel
+WHERE imvlargura<16
+   /*5.e*/
+SELECT imvcodigo, imvlargura, imvcomprimento
+ FROM treina.tbimovel
+WHERE imvcomprimento>15
+
+   /*5.f*/
+SELECT pesnome
+FROM treina.tbpessoa
+WHERE logcodigo=3
+
+   /*5.g*/
+SELECT *
+ FROM treina.tblogradouro
+WHERE logtipo ILIKE '%Rua%'
+
+
+/*6.a*/
+SELECT pesnome
+FROM treina.tbpessoa
+WHERE pescodigo BETWEEN 4 AND 8
+/*6.b*/
+SELECT *
+ FROM treina.tbpessoa
+WHERE pesnome ILIKE 'A%'
+/*6.c*/
+
+SELECT *
+ FROM treina.tbpessoa
+WHERE pesnome ILIKE '%pedro%' 
