@@ -1,0 +1,76 @@
+/*Criando usuário*/
+
+
+CREATE USER hugo WITH PASSWORD '1234'
+superuser createdb createrole replication;/*esse usuário vai poder criar regras, tabelas, replicação, pode criar outros usuários*/
+
+
+
+
+/*Criando usuário com data de expiração para a senha*/
+
+CREATE USER jose WITH PASSWORD '1234'
+
+VALID UNTIL '01-12-2018'
+
+
+
+-------
+CREATE SCHEMA teste;
+
+CREATE TABLE teste.tbpessoa(
+	pescodigo serial,
+	pesnome VARCHAR(100) NOT NULL,
+	CONSTRAINT pk_tbpessoa PRIMARY KEY (pescodigo)
+
+)
+
+/*Adicionando permissão para jose na tabela pessoa teste.tbpessoa*/
+
+GRANT INSERT, UPDATE, SELECT, DELETE
+ ON teste.tbpessoa TO jose;
+ GRANT usage ON SCHEMA teste TO jose;/*Adicionando ao usuário jose permissão ao schema teste*/
+ GRANT usage ON teste.tbpessoa_pescodigo_seq TO jose;/*Adicionando permissão ao usuário jose para a sequence*/
+
+
+/*Criando um grupo*/
+
+CREATE GROUP ipm;
+
+/*Prócimo passo seria dar permissões para o grupo*/
+GRANT INSERT, UPDATE, SELECT, DELETE
+  ON teste.tbpessoa TO GROUP ipm;
+ GRANT USAGE ON SCHEMA teste TO GROUP ipm;
+ GRANT USAGE ON teste.tbpessoa_pescodigo_seq
+   TO GROUP ipm;
+
+/*Adicionar usuários no grupo*/
+ALTER GROUP ipm ADD USER jose;
+ALTER GROUP ipm ADD USER maria;/*Agora os usuários tem as permissões do grupo*/
+
+
+/*Tirando permissões dp select para o grupo ipm*/
+
+REVOKE SELECT ON teste.tbpessoa FROM GROUP ipm;
+
+
+-----------------------------------------------------------------------------
+Criar um novo usuário 
+Dar permissão para INSERT UPDATE E DELETE
+TEM QUE TER ACESSO AO SCHEMA e SEQUENCE
+
+CREATE USER ian WITH PASSWORD '1234';
+GRANT INSERT, UPDATE, DELETE ON teste.tbpessoa TO ian;
+GRANT USAGE ON SCHEMA teste TO ian;
+GRANT USAGE ON teste.tbpessoa_pescodigo_seq TO ian; 
+
+-----------------------------------------------------------------------------
+Link com mais formas de privilégios no banco
+
+https://www.devmedia.com.br/gerenciando-usuarios-e-permissoes-no-postgresql/14301
+
+
+
+
+
+

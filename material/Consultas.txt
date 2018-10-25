@@ -1,0 +1,79 @@
+SELECT pescodigo, pesnome
+	FROM treina.tbpessoa;
+
+SELECT LOWER(pesnome) AS teste,/*Tras o resultado todo com letras minusculas*/
+       UPPER(pesnome)AS TESTE,/*Tras o resultado todo com letras minusculas*/
+       INITCAP(pesnome)AS Teste/*Tras somente a primeira letra em minusculo*/
+	FROM treina.tbpessoa;
+
+SELECT to_char(taxvalor, '99999999990D99') AS VALOR,/*Converte um valor numerórico em char trocando o ponto por vírgula*/
+	taxvalor AS semFormacacao
+FROM treina.tbtaxa;
+
+
+SELECT to_char(taxdata, 'DD/MM/YYYY') AS data_formatada,
+	taxdata AS data_nao_formatada
+	FROM treina.tbtaxa;
+
+
+SELECT taxdata + integer '7' AS data_somando,/*Data soma com +7*/
+	taxdata AS data_original
+	FROM treina.tbtaxa;
+
+
+/*Registros que estiverem repetidos não irão aparecer */
+
+SELECT DISTINCT ctpdescricao
+	FROM treina.tbpessoacontato;
+
+
+/*Utilizando where*/
+
+SELECT *
+	FROM treina.tbpessoa
+       WHERE pessexo=1 AND pestipo=3;
+
+SELECT *
+	FROM treina.tblogradouro
+	WHERE logcodigo>3;
+
+
+/*Utilizando o between em questão de performance é melhor*/
+
+SELECT * 
+	FROM treina.tblogradouro
+	WHERE logcodigo BETWEEN 1 AND 3;
+
+
+	/*LIKE serve para identificar um conjunto de caracteres dentro de uma coluna, ILIKE ignora letras maiusculas de minusculas*/
+SELECT *
+ FROM treina.tblogradouro
+WHERE logdescricao LIKE '%Jus%';
+
+
+SELECT *
+ FROM treina.tblogradouro
+WHERE UPPER(logdescricao) LIKE UPPER('%Jus%');/*Transforma tudo em letra maiuscula para coparação*/
+
+/*VErificando qual dado começa com determinado caracters*/
+
+SELECT *
+ FROM treina.tblogradouro
+WHERE logdescricao LIKE 'Pre%';/*Termina com coloca-se %PRe*/
+
+
+/*Utilizando o ILIKe*/
+
+SELECT *
+ FROM treina.tblogradouro
+WHERE logdescricao ILIKE 'pre%'/*ignora se está em maiúsculo */
+
+/*Buscar todas as informações que estão nulas em meu banco de dados*/
+
+SELECT * 
+FROM treina.tbpessoacontato
+WHERE ctpramal IS NULL;
+
+SELECT * 
+FROM treina.tbpessoacontato
+WHERE ctpramal IS NOT NULL;/*Ramal não é nulo*/

@@ -1,0 +1,151 @@
+CREATE TABLE public.cliente(
+	id serial,
+	nome varchar(20) NOT NULL,
+	telefonefixo varchar(20) NOT NULL,
+	email varchar(20) NOT NULL,
+	sexo VARCHAR(1) NOT NULL,
+	datacadastro TIMESTAMP,
+	dataalteracao TIMESTAMP,
+	CONSTRAINT pk_cliente PRIMARY KEY (id)
+);
+
+
+CREATE FUNCTION data_cadastro() 
+ RETURNS TRIGGER AS $$
+ BEGIN
+   NEW.datacadastro=now();
+   RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
+
+CREATE TRIGGER data_cadastro_novo_cliente
+ BEFORE INSERT 
+  ON cliente
+ FOR EACH ROW
+EXECUTE PROCEDURE data_cadastro();
+
+
+INSERT INTO public.cliente(
+	nome, telefonefixo, email, sexo 
+)VALUES ('Hugo', '387398247', 'ffmann04@gmail.com', 'M')
+
+
+SELECT *
+FROM public.cliente
+
+
+/*Criação de trigger para registro de momento de alteração da tabela*/
+
+CREATE FUNCTION data_alteracao()
+RETURNS TRIGGER AS $$
+ BEGIN 
+  NEW.dataalteracao=now();
+  RETURN NEW;
+ END;
+ $$ LANGUAGE 'plpgsql';
+
+ CREATE TRIGGER data_alteracao_novo_cliente 
+ BEFORE UPDATE 
+  ON cliente
+ FOR EACH ROW
+EXECUTE PROCEDURE data_alteracao();
+
+
+update public.cliente
+ set nome='Hugo Hoffmann'
+ WHERE id=1
+
+ 
+SELECT *
+FROM public.cliente
+
+
+/*Criação de tabela auditoria*/
+
+CREATE TABLE public.auditoria(
+    id serial,
+    tabela varchar (40),
+    acao varchar(10),
+    usuario varchar(50),
+    data_hora TIMESTAMP,
+    chave varchar(255),
+    antes varchar(4000),
+    depois varchar(4000),
+    CONSTRAINT pk_auditoria PRIMARY KEY (id)
+)
+
+
+/*Função para a inserção de dados na tabela auditoria, onde irá captar os dados inseridos na tabela cliente, sendo que também setrá registrado usuário, a ação que está sendo executada etc*/
+CREATE FUNCTION auditoria_insert()
+RETURNS TRIGGER AS $$
+BEGIN
+INSERT INTO auditoria(
+	tabela, acao, usuario, data_hora, chave, antes, depois)
+ VALUES ('cliente','INSERT', CURRENT_USER, NOW(), NEW.id, NULL, 
+         NEW.id || ' ' || NEW.nome || ' ' || NEW.telefonefixo 
+         || ' ' || NEW.telefonecelular || ' ' || NEW.email || ' ' || NEW.sexo);
+ RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
+
+
+/*TRIGGER que é acionada após, depois a inserção de dados na tabela cliente!*/
+
+CREATE TRIGGER tr_auditoria_insert
+ AFTER INSERT 
+  ON cliente
+ FOR EACH ROW 
+EXECUTE PROCEDURE auditoria_insert();
+
+
+/*Criando função para a inserção de dados na tasbela auditoria após a atualização de dados da tabela cliente*/
+
+
+OLD AFTER UPDATE /*Para registrar os dados antigos antes do uPdate*/
+/*Teste para verifição se a trigger está funcionando corrretamente*/
+
+CREATE OR REPLACE FUNCTION auditoria_update()
+RETURNS TRIGGER AS $$
+BEGIN 
+INSERT INTO auditoria(
+	tabela, acao, usuario, data_hora, chave, antes, depois
+) VALUES ('cliente', 'UPDATE', CURRENT_USER, NOW(),NEW.id,OLD.id || ' ' || OLD.nome || ' ' || OLD.telefonefixo 
+         || ' ' || OLD.telefonecelular || ' ' || OLD.email || ' ' || OLD.sexo ,NEW.id || ' ' || NEW.nome || ' ' || NEW.telefonefixo 
+         || ' ' || NEW.telefonecelular || ' ' || NEW.email || ' ' || NEW.sexo);
+   RETURN NEW;
+END;
+$$ LANGUAGE 'plpgsql';
+
+/*TRIGGER para acionar a função depois que for realizado algum UPDATE*/
+CREATE TRIGGER tr_auditoria_update
+AFTER UPDATE
+ON cliente
+FOR EACH ROW
+EXECUTE PROCEDURE auditoria_update()
+
+UPDATE cliente 
+SET telefonecelular='47-7894-5'
+WHERE id=5
+
+/*Função para registro dos dados assim que for deletado algum registro da tabela cliente*/
+
+
+
+CREATE OR REPLACE FUNCTION auditoria_delete()
+ RETURNS TRIGGER AS $$
+ BEGIN
+  INSERT INTO auditoria(
+    tabela, acao, usuario, data_hora, chave, antes, depois              
+    )VALUES ('cliente','DELETE', CURRENT_USER ,NOW(),OLD.ID, OLD.id || ' ' || OLD.nome || ' ' || OLD.telefonefixo 
+         || ' ' || OLD.telefonecelular || ' ' || OLD.email || ' ' || OLD.sexo ,NULL);
+   RETURN NEW;
+ END;
+ $$ LANGUAGE 'plpgsql';
+
+/*Criação de TRIGGER para chamada de função, depois de ser realizado um delete, será disparada a trig ger*/
+ CREATE TRIGGER tr_auditoria_delete
+ AFTER DELETE
+ ON cliente
+ FOR EACH ROW
+ EXECUTE PROCEDURE auditoria_delete()
+

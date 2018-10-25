@@ -1,0 +1,39 @@
+/*Transação*/
+
+BEGIN;
+
+INSERT INTO public.cliente(
+	nome, telefonefixo, telefonecelular, email, sexo
+)VALUES ('Melissa', '47-8975-46', '78654', 'hugio@yahoo', 'M');
+
+UPDATE cliente
+ SET nome='MArcos bruno',
+     email= 'marcos@seila.com.br'
+     WHERE id =1;
+
+ DELETE FROM cliente id=6;
+
+ ROLLBACK;
+
+ /*ROLLBACK serve para que caso de algum tipo de erro nas ações acima, ele cancela todas as outras, ex, se o para que ele caso não de erro e possa realizar as
+ alterações, deve-se substituir o rollback por commit*/
+
+-------
+
+/*SAVE POINT*/
+BEGIN;
+
+INSERT INTO public.cliente(
+	nome, telefonefixo, telefonecelular, email, sexo
+)VALUES ('Melissa', '47-8975-46', '78654', 'hugio@yahoo', 'M');
+
+UPDATE cliente
+ SET nome='MArcos bruno',
+     email= 'marcos@seila.com.br'
+     WHERE id =1;
+SAVEPOINT save01
+ DELETE FROM cliente id=6;
+
+ROLLBACK TO SAVEPOINT save01;
+
+SAVEPOINT save01

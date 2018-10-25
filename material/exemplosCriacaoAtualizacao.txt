@@ -1,0 +1,65 @@
+postgres
+
+Criando uma tabela com uma chave primaria 
+
+create table slide19.tbdepartamento(
+	depcodigo serial,//serial é para o número ir aumentasndo sozinho
+	depnome varchar(20) not null, 
+	depsigla varchar (3) not null,
+	constraint pk_tbdepartamento primary key(depcodigo)
+);
+
+Inserção de dados na tabela criada acima:
+
+INSERT INTO slide19.tbdepartamento(
+	depnome, depsigla
+)VALUES ('Recursos Humanos', 'RH');
+
+Selecionando dados
+
+SELECT * FROM slide19.tbdepartamento;
+
+
+Atualizando dados  
+
+UPDATE slide19.tbdepartamento
+	SET depnome=Financeiro
+ WHERE dpcodigo=2;
+
+
+Apagando dados(Registros) da tabela
+
+DELETE FROM slide19.tbdepartamento
+ WHERE depcodigo=2;
+
+Criando outra tabela tendo uma chave estrangeira da tabela anterior
+
+CREATE TABLE slide.19.tbfuncionario(
+	funcodigo serial,
+	funnome varchar(100) not null,
+	funendereco varchar(150) not null,
+	fundatanasc date not null,
+	depcodigo integer,
+	constraint pk_tbfuncionario primary key (funcodigo),
+	constraint "FK TBFUNCIONARIO -> TDDEPARTAMENTO" 
+	foreign key (depcodigo) 
+	references slide19.tbdepartamento(depcodigo)
+)
+
+Inserção de dados na tabela criada(Lembrando que tem que se preencher a chave estrangeira)
+INSERT INTO slide19.tbfuncionario(
+	funnome, funendereco, fundatanasc, depcodigo
+)VALUES ('Mateus Livramento', 'Rua Raulino', '10/09/1899', 1)
+
+
+
+Zerar a sequencia de um serial em uma chave primária 
+
+ALTER SEQUENCE slide19.tbdepartamento_depcodigo_seq RESTART
+
+
+
+
+
+
+

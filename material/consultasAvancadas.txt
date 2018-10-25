@@ -1,0 +1,224 @@
+SELECT *
+  FROM treina.tblogradouro
+ WHERE logdescricao = 'Ivo Silveira' 
+    OR logdescricao = 'Oscar Barcelos';
+
+
+SELECT *
+FROM treina.tblogradouro
+ WHERE logtipo = 'Rua'
+  AND logdescricao = 'SALVADOR';
+
+
+
+SELECT *
+  FROM treina.tblogradouro,
+ WHERE NOT logtipo = 'AVENIDA';
+
+
+INSERT INTO treina.tblogradouro(
+	logtipo, logdescricao
+)VALUES('Beco','Salvador');
+
+SELECT * 
+FROM treina.tblogradouro
+WHERE NOT logtipo='Beco';
+
+// Ordem crescente
+SELECT * 
+FROM treina.tblogradouro
+ORDER BY logdescricao
+
+
+// Ordem decrescente
+SELECT * 
+FROM treina.tblogradouro
+ORDER BY logdescricao DESC
+
+
+//Soma
+SELECT SUM(taxvalor)
+FROM treina.tbtaxa;
+
+
+//Média
+
+SELECT AVG(taxvalor)
+FROM treina.tbtaxa; 
+
+//Descobrir o menos valor
+
+SELECT MIN(taxvalor)
+FROM treina.tbtaxa;
+
+SELECT * 
+FROM treina.tbpessoa
+WHERE pesnome='Alex'
+
+
+SELECT * 
+FROM treina.tbpessoa
+WHERE pesnome='Tiago'
+
+
+SELECT *
+FROM treina.tbtaxa
+
+7650 7651
+
+INSERT INTO treina.tbtaxa(
+	pescodigo, imvcodigo,taxcodigo, taxdata, taxvalor 
+
+)VALUES(100003,88,100,'01/10/2017',50)
+
+INSERT INTO treina.tbtaxa(
+	pescodigo, imvcodigo, taxcodigo, taxdata, taxvalor
+
+)VALUES(100003,89,101,'30/08/2016',60)
+INSERT INTO treina.tbtaxa(
+	pescodigo, imvcodigo, taxcodigo, taxdata, taxvalor
+
+)VALUES(100004,90,102,'25/08/2016',100)
+INSERT INTO treina.tbtaxa(
+	pescodigo, imvcodigo, taxcodigo, taxdata, taxvalor
+
+)VALUES(100004,91,103,'24/09/2014',150)
+
+// DESCOBRIR O MAIOR VALOR
+
+SELECT MAX(taxvalor) AS "Valor máximo", MIN(taxvalor) AS Valor_minimo
+FROM treina.tbtaxa
+
+SELECT SUM(taxvalor) as Soma
+FROM treina.tbtaxa,
+WHERE pescodigo=
+
+select *
+FROM treina.tbtaxa
+WHERE pescodigo=100004 or pescodigo=100003
+
+SELECT SUM(taxvalor) AS Soma
+FROM treina.tbtaxa
+WHERE pescodigo=100003
+
+SELECT SUM(taxvalor) AS soma
+FROM treina.tbtaxa
+WHERE pescodigo=100004
+
+
+/*Utilização do grup by*/
+
+
+SELECT pescodigo, SUM(taxvalor)
+FROM treina.tbtaxa
+GROUP BY pescodigo
+
+
+// Total de cada venda 
+
+SELECT vencodigo, SUM(vprquant * vprvalorunit)
+    FROM venda.tbvendaproduto 
+  GROUP BY vencodigo;
+
+
+// Contar quantas pessoas tem a mesma taxa
+SELECT pescodigo, COUNT(taxvalor) AS quantidade
+	FROM treina.tbtaxa
+GROUP BY PESCODIGO;
+
+//Filtrando uma consulta que se utiliza group by 
+SELECT pescodigo, SUM(taxvalor)
+    FROM treina.tbtaxa 
+  GROUP BY pescodigo 
+  HAVING SUM(taxvalor) > 100;
+
+
+
+A cláusula LIMIT é utilizada para limitar o número de resultados de uma SQL. Então, se sua SQL retornar 1000 linhas, mas você quer apenas as 10 primeiras, você deve executar uma instrução do tipo:
+
+SELECT * FROM treina.tblogradouro LIMIT 10;
+
+// verificar a maior taxa e mostrar somente ela utilizando o limite de uma linha
+SELECT * 
+FROM treina.tbtaxa 
+ORDER BY taxvalor DESC LIMIT 1
+
+Agora, vamos supor que você quer somente os resultados de 11 a 20. Com a instrução OFFSET fica fácil, basta proceder da seguinte forma:
+
+SELECT * FROM treina.tblogradouro LIMIT 3 OFFSET 2;//ignora os dois primeiros registros do select começa a mostrar a partir do registro 3
+
+/*Total de cada venda*/
+SELECT vencodigo, SUM(vprvalorunit * vprquantidade) 
+    FROM venda.tbvendaproduto 
+  GROUP BY vencodigo;
+
+
+/*Dúvida de ontem: Como formatar a quantidade de casas decimais*/
+SELECT CAST(AVG(taxvalor) AS numeric(15,2)) 
+    FROM treina.tbtaxa
+
+
+/*Utilização de uma view*/
+
+CREATE VIEW taxa_estado AS/*View serve para que se não precise repetir um SELECT utilizado*/
+SELECT pescodigo, COUNT(pescodigo) AS qtdtaxas, SUM(taxvalor) AS total
+    FROM treina.tbtaxa
+GROUP BY pescodigo;
+/*Chamando uma view*/
+SELECT *
+FROM trian.estado/*Como a view cria uma tabela virtual, deve-se chama-lá normalmente*/
+
+
+/*Pode-se utilizar o CREATE OR REPLACE para alterar uma view, quando se for adicionar uma nova coluna*/
+
+CREATE OR REPLACE VIEW treina.taxa_estado AS
+ SELECT pescodigo, SUM(taxvalor) AS total
+    FROM treina.tbtaxa
+  GROUP BY pescodigo;
+
+/*PAra se apagar uma view inteira para que se possa adiconar uma outra com colunas a menos*/
+
+ DROP VIEW treina.estado
+
+/*Tabela temporária, fica ativa somente duramente a conexão com o banco de dados, outra questão é que a mesma não se atualiza caso seja adicionado um novo registro, diferente da view que se atualiza e fica lá até alguém dar um drop*/
+
+CREATE TEMPORARY TABLE estado AS/*Não precisa por schema, pois ela é temporária*/
+SELECT pescodigo, COUNT(pescodigo) AS qtdtaxas, SUM(taxvalor) AS total
+    FROM treina.tbtaxa
+GROUP BY pescodigo;
+/*Importante ressaltar que o resultado da consulta fica salvo em memória, então se acontecer uma nova inserção, alteração ou exclusão que envolve um dos registros que aparecem na consulta, essa alteração não irá aparecer no resultado da tabela temporária.*/
+/*Verificando se existe uma tabela temporária e caso existir ela será apagada*/
+DROP TABLE IF EXISTS estado;
+
+/*Ele vai exclir a tabela temporária se ela existe e depois cria novamente*/
+DROP TABLE IF EXISTS estado;
+CREATE TEMPORARY TABLE estado AS/*Não precisa por schema, pois ela é temporária*/
+SELECT pescodigo, COUNT(pescodigo) AS qtdtaxas, SUM(taxvalor) AS total
+    FROM treina.tbtaxa
+GROUP BY pescodigo;
+
+
+/*Se uma soma retornar nulo, o retorno retorna 0, pode-se utilizar com strings também*/
+
+SELECT COALESCE (SUM(taxvalor), NULL, 0) AS SOMA 
+    FROM treina.tbtaxa 
+  WHERE pescodigo = 2;/*Serve para que se não obtenha um erro ao tentar executar alguma operação no php com o valor nulo*/
+
+/*Testando o COALESCE com campo do tipo texto*/
+SELECT COALESCE(clisexo, null, 'Indefinido') 
+    FROM  venda.tbcliente;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

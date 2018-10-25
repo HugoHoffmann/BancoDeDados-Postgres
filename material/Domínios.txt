@@ -1,0 +1,30 @@
+CREATE DOMAIN treina.descricao AS character varying (200) NOT NULL
+CONSTRAINT check_descricao
+ CHECK (VALUE IN ('t','c','s'));
+
+
+CREATE DOMAIN treina.descricao AS character varying (200) NOT NULL
+CONSTRAINT check_descricao
+ CHECK (VALUE IN ('t','c','s'));
+
+
+CREATE DOMAIN 
+    treina.nomes
+     AS VARCHAR (100) NOT NULL 
+
+
+ CREATE DOMAIN treina.verifica
+  AS SMALLINT NOT NULL
+  DEFAULT 1
+CONSTRAINT check_verifica
+check (VALUE IN (1,0))
+
+
+
+CREATE TABLE treina.tbcliente(	
+	clicodigo serial,
+	clinome treina.nome,
+	clidescricao treina.descricao,
+	cliativo treina.verifica,
+	CONSTRAINT pk_tbcliente PRIMARY KEY (clicodigo)
+)

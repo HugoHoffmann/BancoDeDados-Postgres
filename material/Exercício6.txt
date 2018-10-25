@@ -1,0 +1,223 @@
+1)R:
+SELECT imvdescricao, pesnome, logtipo, logdescricao
+FROM treina.tbimovel
+ INNER JOIN treina.tbpessoa
+  ON tbimovel.pescodigo=tbpessoa.pescodigo
+   INNER JOIN treina.tblogradouro
+    ON tbpessoa.logcodigo=tblogradouro.logcodigo
+
+2)R:
+SELECT pesnome, taxvalor, imvdescricao
+FROM treina.tbpessoa
+ INNER JOIN treina.tbtaxa
+  ON tbpessoa.pescodigo=tbtaxa.pescodigo
+   INNER JOIN treina.tbimovel
+    ON tbtaxa.imvcodigo=tbimovel.imvcodigo
+
+3)R:
+
+SELECT pesnome ,SUM(taxvalor)
+FROM treina.tbpessoa
+ INNER JOIN treina.tbtaxa
+  ON tbpessoa.pescodigo=tbtaxa.pescodigo
+GROUP BY tbpessoa.pescodigo
+
+4)R:
+
+
+SELECT SUM(taxvalor), pestipo
+FROM treina.tbtaxa
+ LEFT JOIN treina.tbpessoa
+  ON tbtaxa.pescodigo=tbpessoa.pescodigo
+GROUP BY tbpessoa.pestipo
+
+5)R:
+SELECT COUNT(tbimovel.logcodigo)
+ FROM treina.tbimovel
+  INNER JOIN treina.tblogradouro
+   ON tbimovel.logcodigo=tblogradouro.logcodigo
+WHERE tblogradouro.logcodigo=1
+
+6)R:
+SELECT imvdescricao, pesnome, ctpnumero
+ FROM treina.tbpessoa
+  INNER JOIN treina.tbimovel
+   ON tbpessoa.pescodigo=tbimovel.pescodigo
+  INNER JOIN treina.tbpessoacontato
+   ON tbpessoa.pescodigo=tbpessoacontato.pescodigo
+
+7)R:
+SELECT SUM(taxvalor) AS "VALOR TOTAL DE TAXA"
+ FROM treina.tbtaxa
+  INNER JOIN treina.tbimovel
+   ON tbtaxa.imvcodigo=tbimovel.imvcodigo
+    INNER JOIN treina.tblogradouro
+	 ON tbimovel.logcodigo=tblogradouro.logcodigo
+WHERE tblogradouro.logtipo='Rua'
+
+/*Verificar com o professor para ver como que faz esta conexão*/
+
+8)R:
+
+SELECT  imvdescricao, pesnome, taxvalor, logdescricao
+FROM treina.tbtaxa
+ INNER JOIN treina.tbimovel
+  ON tbimovel.imvcodigo=tbtaxa.imvcodigo
+   INNER JOIN treina.pessoa
+    ON tbimovel.pescodigo=tbpessoa.pesnome
+   INNER JOIN treina.logradouro
+    ON tbpessoa.logcodigo=tblogradouro.logcodigo
+   ORDER BY taxvalor
+   LIMIT 1;
+
+9)R:
+
+SELECT (tbimovel.imvlargura*tbimovel.imvcomprimento)AS "Área", pesnome, logtipo, logdescricao
+FROM treina.tbimovel
+ INNER JOIN treina.tbpessoa
+  ON tbimovel.pescodigo=tbpessoa.pescodigo
+  INNER JOIN treina.tblogradouro
+   ON tblogradouro.logcodigo=tbimovel.logcodigo
+WHERE tbimovel.imvlargura*tbimovel.imvcomprimento<=400
+
+10)R:/*Verificar com o professor*/
+
+SELECT tbpessoa.pesnome,tblogradouro.logdescricao
+FROM treina.tblogradouro
+ INNER JOIN treina.tbpessoa
+  ON tbpessoa.logcodigo=tblogradouro.logcodigo
+   INNER JOIN treina.tbimovel
+    ON tbpessoa.pescodigo=tbimovel.pescodigo
+ WHERE pesnome LIKE 'Cli%'
+
+11)R:
+
+
+
+SELECT pesnome, logdescricao, taxvalor
+  FROM treina.tbtaxa
+ INNER JOIN treina.tbpessoa
+  ON tbtaxa.pescodigo=tbpessoa.pescodigo
+ INNER JOIN treina.tbimovel
+  ON tbtaxa.imvcodigo=tbimovel.imvcodigo
+ INNER JOIN treina.tblogradouro
+  ON tbpessoa.logcodigo=tblogradouro.logcodigo/*Foi pego o endereço da pessoa*/
+WHERE taxvalor between 100.00 AND 1000.00;
+
+12)R:
+CREATE VIEW questao_12 AS
+SELECT imvdescricao, pesnome, logtipo, logdescricao
+FROM treina.tbimovel
+ INNER JOIN treina.tbpessoa
+  ON tbimovel.pescodigo=tbpessoa.pescodigo
+   INNER JOIN treina.tblogradouro
+    ON tbpessoa.logcodigo=tblogradouro.logcodigo
+
+
+13)R:
+
+SELECT pesnome, logdescricao, imvdescricao
+FROM treina.tbpessoa
+ INNER JOIN treina.tbimovel
+  ON(tbpessoa.pescodigo=tbimovel.pescodigo)
+   INNER JOIN treina.tblogradouro
+    ON(tbpessoa.logcodigo=tblogradouro.logcodigo)
+LIMIT 4
+
+14)R:
+SELECT *
+ FROM treina.tbpessoa
+WHERE pescodigo BETWEEN 2 AND 40
+
+15)R:
+
+SELECT pesnome, logtipo, logdescricao, taxvalor
+ FROM treina.tbpessoa
+  INNER JOIN treina.tbpessoacontato
+   ON(tbpessoa.pescodigo=tbpessoacontato.pescodigo)
+    INNER JOIN treina.tbimovel
+	 ON(tbpessoa.pescodigo=tbimovel.pescodigo)
+	  INNER JOIN treina.tbtaxa
+	   ON(tbimovel.imvcodigo=tbtaxa.imvcodigo)
+	    INNER JOIN treina.tblogradouro
+		 ON(tbpessoa.logcodigo=tblogradouro.logcodigo)
+WHERE ctpnumero LIKE '47%'
+
+16)R:
+
+SELECT (
+		SELECT CASE WHEN EXISTS(
+ 		SELECT *
+  		 FROM treina.tblogradouro
+  		  INNER JOIN treina.tbimovel
+			ON(tblogradouro.logcodigo=tbimovel.logcodigo)
+		WHERE tblogradouro.logcodigo=treina.tbimovel.logcodigo LIMIT 1)
+THEN CAST (true AS BOOLEAN)
+ELSE CAST (false AS BOOLEAN)
+END)
+
+
+/*Outra forma*/
+
+SELECT imvcodigo, logcodigo, imvdescricao
+ FROM treina.tbimovel
+WHERE EXISTS (SELECT logcodigo
+		FROM treina.tblogradouro
+ 		WHERE logcodigo=treina.tbimovel.logcodigo LIMIT 1)
+
+17)R:
+
+SELECT CASE WHEN EXISTS(
+ SELECT *
+  FROM treina.tbpessoa
+ WHERE pescodigo='1'
+)
+THEN CAST(1 AS BIT)
+ELSE CAST(0 AS BIT)
+END
+
+18)R:
+
+SELECT pesnome, tbpessoa.pescodigo
+FROM treina.tbpessoa
+LEFT JOIN treina.tbimovel
+ ON(tbpessoa.pescodigo=tbimovel.pescodigo)
+WHERE tbimovel.pescodigo IS NULL
+19)R:
+
+ SELECT pesnome, tbpessoa.pescodigo
+FROM treina.tbpessoa
+INNER JOIN treina.tbimovel
+ ON(tbpessoa.pescodigo=tbimovel.pescodigo)
+
+
+SELECT pesnome, tbpessoa.pescodigo
+FROM treina.tbpessoa
+LEFT JOIN treina.tbimovel
+ ON(tbpessoa.pescodigo=tbimovel.pescodigo)
+WHERE tbimovel.pescodigo IS NOT NULL
+
+20)R:
+
+SELECT pesnome
+ FROM treina.tbpessoa
+WHERE pesnome  ILIKE 'Ale%'
+ UNION
+SELECT pesnome
+FROM treina.tbpessoa
+ WHERE pesexo=1;
+
+SELECT pesnome 
+ FROM treina.tbpessoa
+WHERE pesnome ILIKE 'Cli%' OR pessexo=1;
+
+21)R:
+
+SELECT SUM(imvlargura*imvcomprimento) AS "METROS ²:"
+FROM treina.tbpessoa
+INNER JOIN treina.tbimovel
+ ON tbimovel.pescodigo=tbpessoa.pescodigo
+GROUP BY treina.tbpessoa.pescodigo
+HAVING SUM(imvlargura*imvcomprimento)>40
+
+
